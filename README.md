@@ -42,7 +42,15 @@ Another option is to use the proxy solution provided by this repository, which a
 ## Finding Your WSL2 IP Address
 
 in your WSL2 instance, run the following command:
-`ip addr show eth0`
+
+`ip addr show eth0 | grep 'inet\b' | awk '{print $2}' | cut -d/ -f1`
+
+this will return the IP address of your WSL2 instance.
+
+`172.23.08.34`
+
+if this doesn't work because the network adapter isn't on eth0, you can also run the following command:
+`ip addr show`
 look for the address listed after `inet`. Example:
 
 ```bash
