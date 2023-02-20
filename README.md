@@ -24,7 +24,7 @@ Another option is to use the proxy solution provided by this repository, which a
 
    Alternatively, you can define these variables in the server.js file
 
-   ```json
+   ```js
    const addr = "172.16.0.0"; // the IP of your WSL2 instance
    const target_port = 4444; // the port your node.js server is listening on
    const port = 5555; // the port you want to listen on for incoming HTTP requests
