@@ -2,44 +2,60 @@
 
 A simple HTTP proxy server that forwards requests to a Node.js server running on a WSL2 instance.
 
-## Why?
+## Why use node-wsl-proxy?
 
-If you're running a Node.js server in WSL2 and want to access it from another machine on your network, you may run into issues due to the default network configuration. WSL2 can run in two network modes: a default "NAT" mode and a "bridge" mode. In "NAT" mode, WSL2 instances are assigned a private IP address, and incoming connections from the network are not directly forwarded to them. In "bridge" mode, WSL2 instances are assigned a unique IP address on the host machine's network and can accept incoming connections directly.
+If you're running a Node.js server in WSL2 and want to access it from another machine on your network, you may run into issues due to the default network configuration. This should work for the default "NAT" mode as WSL2 instances are assigned a private IP address, and incoming connections from the network are not directly forwarded to them.
 
-One solution could be is to manually configure a static IP address for your WSL2 instance, which would allow you to connect to your Node.js server using that IP address. If you prefer to take this approach, you can find instructions online for how to configure a static IP address in WSL2.
+## Alternative Solution
 
-Another option is to use the proxy solution provided by this repository, which allows you to access your Node.js server in WSL2 without having to configure a static IP address. However, keep in mind that opening up ports on your Windows firewall and your WSL2 instance's firewall may be necessary for this solution to work.
+Manually configure a static IP address for your WSL2 instance, which would allow you to connect to your Node.js server using that IP address. If you prefer to take this approach, you can find instructions online for how to configure a static IP address in WSL2.
 
-## Usage
+## Clone/Install Dependencies
 
 1. Clone this repository to your host machine.
 2. Start your Node.js server inside your WSL2 instance.
 3. In a terminal, navigate to the cloned repository.
 4. Run `npm install` to install the required dependencies.
-5. Start the proxy server by running the following command:
 
-   `node server.js <WSL2_IP> <WSL2_PORT> <PROXY_PORT>`
+## Start
 
-   where `<WSL2_IP>` is the IP address of your WSL2 instance, `<WSL2_PORT>` is the port your Node.js server is listening on in the WSL2 instance, and `<PROXY_PORT>` is the port you want to listen on for incoming HTTP requests on the host machine.
+1. Start the proxy server by running the following command:
 
-   Alternatively, you can define these variables in the server.js file
+   `node proxy.js`
 
-   ```js
-   const addr = "172.16.0.0"; // the IP of your WSL2 instance
-   const target_port = 4444; // the port your node.js server is listening on
-   const port = 5555; // the port you want to listen on for incoming HTTP requests
-   ```
+   This automatically detects wsl instances and node sever ports and prompts the user to select which instance and ports to use
 
-   and start the proxy server by running the following command:
-   `node server.js`
-
-6. In a web browser or other HTTP client, navigate to `http://localhost:<PROXY_PORT>/` to access your Node.js server running in the WSL2 instance.
-
-   Alternatively, you can navigate to `http://<WINDOWS_LOCAL_IP>:<PROXY_PORT>/` to access your Node.js server running in the WSL2 instance from another machine on your network.
+2. In a web browser or other HTTP client, navigate to `http://localhost:<PROXY_PORT>/` or `http://<WINDOWS_LOCAL_IP>:<PROXY_PORT>/` to access your Node.js server running in the WSL2 instance.
 
    You shouldn't need to bind the WSL2 node server to `0.0.0.0` or `<WSL2_IP>` in order for this to work. Default config should be fine.
 
-## Finding Your WSL2 IP Address
+---
+
+## Start (basic implementation with manual config)
+
+I've updated this repo so that you don't have to manually enter the IP address of your WSL2 instance (as this seems to change on reboot), the port your Node.js server is listening on, and the port you want to listen on for incoming HTTP requests using `proxy.js`
+
+If you have issues with this you can instead use `proxy-basic.js`
+
+1. Start the proxy server by running the following command:
+
+   `node proxy-basic.js`
+
+   (if you have defined the variables in the proxy-basic.js file)
+
+   ```js
+   const addr = process.argv[2] || "172.24.76.254"; // the IP of your WSL2 instance
+   const target_port = process.argv[3] || 7070; // the port your node.js server is listening on
+   const port = process.argv[4] || 6969; // the port you want to listen on for incoming HTTP requests
+   ```
+
+   or
+
+   `node proxy-basic.js <WSL2_IP> <WSL2_PORT> <PROXY_PORT>`
+
+   where `<WSL2_IP>` is the IP address of your WSL2 instance, `<WSL2_PORT>` is the port your Node.js server is listening on in the WSL2 instance, and `<PROXY_PORT>` is the port you want to listen on for incoming HTTP requests on the host machine.
+
+## Finding Your WSL2 IP Address (needed for proxy-basic.js)
 
 in your WSL2 instance, run the following command:
 
@@ -63,6 +79,8 @@ look for the address listed after `inet`. Example:
 ```
 
 in this example the WSL2 IP address is `172.23.08.34`
+
+---
 
 ## Opening Ports
 

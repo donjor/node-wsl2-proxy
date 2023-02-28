@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "http-proxy": "^1.18.1"
+    "http": "^0.0.0",
+    "http-proxy": "^1.18.1",
+    "readline-sync": "^1.4.10"
   }
 }
