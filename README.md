@@ -2,6 +2,8 @@
 
 A simple HTTP proxy server that forwards requests to a Node.js server running on a WSL2 instance.
 
+![ezgif-3-e7a324544a](https://user-images.githubusercontent.com/38745786/221817833-4abd1650-f1fa-4daa-a769-2973fc3e73df.gif)
+
 ## Why use node-wsl-proxy?
 
 If you're running a Node.js server in WSL2 and want to access it from another machine on your network, you may run into issues due to the default network configuration. This should work for the default "NAT" mode as WSL2 instances are assigned a private IP address, and incoming connections from the network are not directly forwarded to them.
