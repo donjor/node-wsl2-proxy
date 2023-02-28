@@ -1,7 +1,7 @@
 const http = require("http");
 const httpProxy = require("http-proxy");
 const proxy = httpProxy.createProxyServer({});
-const { execSync, spawnSync } = require("child_process");
+const { execSync } = require("child_process");
 const readlineSync = require("readline-sync");
 
 function findWSLInstances() {
@@ -114,8 +114,8 @@ function selectProxyPort() {
   }
 }
 
-function startProxy(addr, target_port, port) {
-  const target = "http://" + addr + ":" + target_port;
+function startProxy(ipAddress, WSLIP, target_port, port) {
+  const target = "http://" + WSLIP + ":" + target_port;
   console.log("Proxying requests to", target);
 
   const server = http.createServer((req, res) => {
@@ -123,9 +123,33 @@ function startProxy(addr, target_port, port) {
   });
 
   server.listen(port); // the port you want to listen on for incoming HTTP requests
-  console.log("Proxy server listening on", port);
+  console.log("Proxy server address: http://" + ipAddress + ":" + port);
 }
 
+function getIP(callback) {
+  const { networkInterfaces } = require("os");
+
+  const nets = networkInterfaces();
+  const results = Object.create(null); // Or just '{}', an empty object
+
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      if (net.family === "IPv4" && !net.internal) {
+        if (!results[name]) {
+          results[name] = [];
+        }
+        results[name].push(net.address);
+      }
+    }
+  }
+
+  // If you only want the first IP address, you can return the first result here
+  callback(results[Object.keys(results)[0]][0]);
+
+  // Otherwise, you can pass the entire results object back
+  // callback(results);
+}
 const instances = findWSLInstances();
 
 const instanceName = selectWSLInstance(instances);
@@ -140,4 +164,6 @@ const target_port = selectNodePort(ports);
 
 const port = selectProxyPort();
 
-startProxy(WSLIP, target_port, port);
+getIP((ipAddress) => {
+  startProxy(ipAddress, WSLIP, target_port, port);
+});
